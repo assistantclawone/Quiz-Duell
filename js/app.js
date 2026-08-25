@@ -71,10 +71,22 @@ function renderCategories(){
   });
 }
 
+// Mische Antworten und führe den korrekten Index mit (sonst zeigt 'c' ins Leere).
+function shuffleAnswers(q){
+  // Antworten als [{text, correct}] übergeben und mischen
+  const items = q.a.map((text,i)=>({text, correct: i===q.c}));
+  const mixed = shuffle(items);
+  return {
+    ...q,
+    a: mixed.map(m=>m.text),
+    c: mixed.findIndex(m=>m.correct)
+  };
+}
+
 function selectCategory(key){
   state.category = key;
   const cat = QUESTION_BANK[key];
-  state.questions = shuffle(cat.questions.map(q=>({...q, a: shuffle(q.a)}))).slice(0, QUESTIONS_PER_GAME);
+  state.questions = shuffle(cat.questions.map(shuffleAnswers)).slice(0, QUESTIONS_PER_GAME);
   state.qIndex = 0;
   state.p1Score = 0;
   state.p2Score = 0;
